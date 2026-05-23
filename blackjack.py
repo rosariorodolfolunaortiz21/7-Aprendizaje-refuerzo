@@ -1,3 +1,7 @@
+"""
+Blackjack simplificado como problema de Aprendizaje por Refuerzo
+"""
+
 from RL import MDPsim, SARSA, Q_learning, PoliticaGreedy
 from random import randint
 
@@ -8,21 +12,23 @@ class BlackJack(MDPsim):
 
         self.gama = gama
 
-        # Estados:
+        # ========================================================
+        # ESPACIO DE ESTADOS
+        # Estado:
         # (suma_jugador, carta_visible_crupier, as_usable)
+        # ========================================================
 
         self.estados = []
 
         for suma in range(12, 22):
             for carta_crupier in range(1, 11):
                 for as_usable in [True, False]:
-
                     self.estados.append(
                         (suma, carta_crupier, as_usable)
                     )
 
+        # estado terminal
         self.estados.append("TERMINAL")
-
 
     # ============================================================
     # REPARTIR CARTA
@@ -42,4 +48,66 @@ class BlackJack(MDPsim):
         if carta >= 10:
             return 10
 
-        return carta        
+        return carta
+
+    # ============================================================
+    # EVALUAR MANO
+    # ============================================================
+
+    def evaluar_mano(self, cartas):
+        """
+        Calcula:
+        - suma total
+        - si existe As usable
+
+        Un As usable significa que puede contarse como 11
+        sin pasarse de 21.
+        """
+
+        suma = sum(cartas)
+
+        ases = cartas.count(1)
+
+        as_usable = False
+
+        # convertir UN As de 1 -> 11 si conviene
+        if ases > 0 and suma + 10 <= 21:
+            suma += 10
+            as_usable = True
+
+        return suma, as_usable
+
+    # ============================================================
+    # ESTADO INICIAL
+    # ============================================================
+
+    def estado_inicial(self):
+
+        # --------------------------------------------------------
+        # Repartir jugador
+        # --------------------------------------------------------
+
+        self.cartas_jugador = [
+            self.reparte_carta(),
+            self.reparte_carta()
+        ]
+
+        # --------------------------------------------------------
+        # Repartir dealer
+        # --------------------------------------------------------
+
+        self.cartas_crupier = [
+            self.reparte_carta(),
+            self.reparte_carta()
+        ]
+
+        # --------------------------------------------------------
+        # Evaluar mano jugador
+        # --------------------------------------------------------
+
+        suma_jugador, as_usable = self.evaluar_mano(
+            self.cartas_jugador
+        )
+
+        # carta visible dealer
+        carta_visible = self.cartas_crupier[0]
