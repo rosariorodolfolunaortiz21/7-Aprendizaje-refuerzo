@@ -22,3 +22,24 @@ class BlackJack(MDPsim):
                     )
 
         self.estados.append("TERMINAL")
+
+
+    # ============================================================
+    # REPARTIR CARTA
+    # ============================================================
+
+    def reparte_carta(self):
+        """
+        Devuelve una carta aleatoria.
+
+        Probabilidades:
+        - 1..9  -> 1/13
+        - 10    -> 4/13
+        """
+
+        carta = randint(1, 13)
+
+        if carta >= 10:
+            return 10
+
+        return carta        
