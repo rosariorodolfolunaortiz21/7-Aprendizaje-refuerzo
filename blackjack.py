@@ -360,3 +360,131 @@ if __name__ == "__main__":
         "-" * 15
     )
 
+
+"""
+===============================================================
+RESPUESTAS TEÓRICAS
+===============================================================
+
+1. ¿Cuáles son los estados, acciones, recompensas y transiciones?
+
+Estados:
+Cada estado se representa como:
+
+(suma_jugador, carta_visible_crupier, as_usable)
+
+- suma_jugador:
+  valor entre 12 y 21
+
+- carta_visible_crupier:
+  valor entre 1 y 10
+
+- as_usable:
+  True o False
+
+La cardinalidad total es:
+
+10 × 10 × 2 = 200 estados
+
+
+Acciones:
+0 -> Stand (plantarse)
+1 -> Hit (pedir carta)
+
+
+Recompensas:
++1   -> victoria
+0    -> empate
+-1   -> derrota o bust
++1.5 -> blackjack natural
+
+
+Transiciones:
+Dependen de:
+- la acción del jugador
+- la carta aleatoria repartida
+- la política fija del dealer
+
+
+===============================================================
+
+2. ¿Cómo representar eficientemente los estados?
+
+Se utiliza únicamente la información mínima necesaria
+para tomar decisiones óptimas:
+
+- suma del jugador
+- carta visible del dealer
+- existencia de As usable
+
+No se guarda el historial completo de cartas debido
+a la propiedad de Markov.
+
+
+===============================================================
+
+3. ¿Qué pasa si se modifica epsilon?
+
+epsilon controla la exploración.
+
+- epsilon alto:
+  más acciones aleatorias
+  más exploración
+
+- epsilon bajo:
+  más explotación de la política aprendida
+
+Si epsilon = 0:
+el agente deja de explorar y puede quedarse atrapado
+en una política subóptima.
+
+
+===============================================================
+
+4. ¿Cómo afecta alfa?
+
+alfa es la tasa de aprendizaje.
+
+- alfa alto:
+  aprendizaje rápido pero inestable
+
+- alfa bajo:
+  aprendizaje lento pero más estable
+
+Valores intermedios suelen producir mejores resultados.
+
+
+===============================================================
+
+5. ¿Qué algoritmo es más adecuado?
+
+Q-learning suele ser más adecuado porque aprende
+directamente la política óptima futura.
+
+SARSA es más conservador porque aprende considerando
+la política exploratoria actual.
+
+
+===============================================================
+
+6. ¿Se puede explicar la política óptima?
+
+Sí.
+
+El agente aprende estrategias similares a las usadas
+en casinos reales:
+
+- pedir con valores bajos
+- plantarse con valores altos
+- arriesgar más si el dealer muestra cartas fuertes
+- ser conservador si el dealer muestra cartas débiles
+
+Por ejemplo:
+- con 20 normalmente conviene plantarse
+- con 13 frente a un dealer mostrando 10,
+  suele convenir pedir
+- con 16 frente a dealer mostrando 6,
+  suele convenir plantarse
+
+===============================================================
+"""
