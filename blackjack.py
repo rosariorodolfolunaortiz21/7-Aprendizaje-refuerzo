@@ -141,3 +141,17 @@ class BlackJack(MDPsim):
             carta_visible,
             as_usable
         )
+
+    # ============================================================
+    # ACCIONES LEGALES
+    # ============================================================
+
+    def acciones_legales(self, s):
+
+        if s == "TERMINAL":
+            return []
+
+        # 0 -> Stand
+        # 1 -> Hit
+
+        return [0, 1]
