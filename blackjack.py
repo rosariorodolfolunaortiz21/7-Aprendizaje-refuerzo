@@ -188,3 +188,175 @@ class BlackJack(MDPsim):
                 s[1],
                 as_usable
             )
+
+        # ========================================================
+        # STAND
+        # ========================================================
+
+        else:
+
+            suma_crupier, as_crupier = self.evaluar_mano(
+                self.cartas_crupier
+            )
+
+            # política fija dealer:
+            # pedir mientras tenga < 17
+
+            while suma_crupier < 17:
+
+                nueva = self.reparte_carta()
+
+                self.cartas_crupier.append(nueva)
+
+                suma_crupier, as_crupier = self.evaluar_mano(
+                    self.cartas_crupier
+                )
+
+            # guardar suma final dealer
+            self.suma_final_crupier = suma_crupier
+
+            return "TERMINAL"
+
+    # ============================================================
+    # RECOMPENSA
+    # ============================================================
+
+    def recompensa(self, s, a, s_):
+
+        # --------------------------------------------------------
+        # estados no terminales
+        # --------------------------------------------------------
+
+        if s_ != "TERMINAL":
+            return 0
+
+        suma_jugador = s[0]
+
+        # ========================================================
+        # SI EL JUGADOR PIDIÓ Y TERMINÓ:
+        # necesariamente fue bust
+        # ========================================================
+
+        if a == 1:
+            return -1
+
+        # ========================================================
+        # BLACKJACK NATURAL
+        # ========================================================
+
+        if self.blackjack_natural:
+            return 1.5
+
+        # ========================================================
+        # COMPARAR CON DEALER
+        # ========================================================
+
+        suma_crupier = self.suma_final_crupier
+
+        # dealer se pasó
+        if suma_crupier > 21:
+            return 1
+
+        # jugador gana
+        if suma_jugador > suma_crupier:
+            return 1
+
+        # jugador pierde
+        if suma_jugador < suma_crupier:
+            return -1
+
+        # empate
+        return 0
+
+    # ============================================================
+    # ESTADO TERMINAL
+    # ============================================================
+
+    def es_terminal(self, s):
+
+        return s == "TERMINAL"
+
+
+# ================================================================
+# MAIN
+# ================================================================
+
+if __name__ == "__main__":
+
+    blackjack = BlackJack(gama=1)
+
+    # ============================================================
+    # SARSA
+    # ============================================================
+
+    Q_sarsa = SARSA(
+        blackjack,
+        alfa=0.1,
+        epsilon=0.1,
+        n_ep=50000,
+        n_iter=100
+    )
+
+    # ============================================================
+    # Q-LEARNING
+    # ============================================================
+
+    Q_ql = Q_learning(
+        blackjack,
+        alfa=0.1,
+        epsilon=0.1,
+        n_ep=50000,
+        n_iter=100
+    )
+
+    # ============================================================
+    # POLÍTICAS ÓPTIMAS
+    # ============================================================
+
+    pi_s = PoliticaGreedy(Q_sarsa)
+
+    pi_q = PoliticaGreedy(Q_ql)
+
+    # ============================================================
+    # MOSTRAR RESULTADOS
+    # ============================================================
+
+    print(
+        "Estado".center(25) + "|" +
+        "SARSA".center(15) + "|" +
+        "Q-learning".center(15)
+    )
+
+    print(
+        "-" * 25 + "|" +
+        "-" * 15 + "|" +
+        "-" * 15
+    )
+
+    for s in blackjack.estados:
+
+        if not blackjack.es_terminal(s):
+
+            accion_sarsa = pi_s(s)
+            accion_q = pi_q(s)
+
+            accion_sarsa = (
+                "Stand" if accion_sarsa == 0 else "Hit"
+            )
+
+            accion_q = (
+                "Stand" if accion_q == 0 else "Hit"
+            )
+
+            print(
+                str(s).center(25) + "|" +
+                accion_sarsa.center(15) + "|" +
+                accion_q.center(15)
+            )
+
+    print(
+        "-" * 25 + "|" +
+        "-" * 15 + "|" +
+        "-" * 15
+    )
+
