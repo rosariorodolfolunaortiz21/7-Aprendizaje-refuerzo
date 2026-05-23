@@ -155,3 +155,36 @@ class BlackJack(MDPsim):
         # 1 -> Hit
 
         return [0, 1]
+
+    # ============================================================
+    # TRANSICIÓN
+    # ============================================================
+
+    def transicion(self, s, a):
+
+        if s == "TERMINAL":
+            return "TERMINAL"
+
+        # ========================================================
+        # HIT
+        # ========================================================
+
+        if a == 1:
+
+            nueva = self.reparte_carta()
+
+            self.cartas_jugador.append(nueva)
+
+            suma, as_usable = self.evaluar_mano(
+                self.cartas_jugador
+            )
+
+            # jugador se pasó
+            if suma > 21:
+                return "TERMINAL"
+
+            return (
+                suma,
+                s[1],
+                as_usable
+            )
