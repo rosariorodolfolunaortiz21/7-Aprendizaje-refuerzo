@@ -111,3 +111,33 @@ class BlackJack(MDPsim):
 
         # carta visible dealer
         carta_visible = self.cartas_crupier[0]
+
+        # --------------------------------------------------------
+        # Blackjack natural
+        # --------------------------------------------------------
+
+        self.blackjack_natural = (
+            suma_jugador == 21 and
+            len(self.cartas_jugador) == 2
+        )
+
+        # --------------------------------------------------------
+        # Si la suma es menor a 12:
+        # pedir automáticamente
+        # --------------------------------------------------------
+
+        while suma_jugador < 12:
+
+            nueva = self.reparte_carta()
+
+            self.cartas_jugador.append(nueva)
+
+            suma_jugador, as_usable = self.evaluar_mano(
+                self.cartas_jugador
+            )
+
+        return (
+            suma_jugador,
+            carta_visible,
+            as_usable
+        )
